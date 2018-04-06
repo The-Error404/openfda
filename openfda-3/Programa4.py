@@ -18,7 +18,7 @@ def getBrandNames():
     <html>
     <body>
 
-    <p>10 Drug's brand names:</p>
+    <p>Brand names:</p>
     <p>{brands}</p>
 
     </body>
