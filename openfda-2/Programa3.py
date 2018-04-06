@@ -1,5 +1,5 @@
 import requests
-r = requests.get('https://api.fda.gov/drug/label.json?search=active_ingredient:aspirin&limit=75')
+r = requests.get('https://api.fda.gov/drug/label.json?search=active_ingredient:aspirin&limit=100&skip')
 main_dict = r.json()['results']
 man_list=[]
 for elem in main_dict:
