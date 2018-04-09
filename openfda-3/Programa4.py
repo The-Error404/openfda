@@ -20,7 +20,7 @@ try:
         <html>
         <body>
 
-        <p>Brand names:</p>
+        <p>Nombres comerciales para 10 medicamentos::</p>
         <p>{brands}</p>
 
         </body>
