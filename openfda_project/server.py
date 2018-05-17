@@ -223,7 +223,8 @@ def getListWar():
     main_dict = data_final['results']
     war_list=[]
     for elem in main_dict:
-        war_list.append("<li>" + str(elem['warnings']).strip("['']") + "</li>")
+        if 'warnings' in elem:
+            war_list.append("<li>" + str(elem['warnings']).strip("['']") + "</li>")
 
     html_str = """
         <!DOCTYPE html>
@@ -257,28 +258,28 @@ def index():
         </head>
         <body>
 
-        <form action = "/listDrugs" method="get">
+        <form action = "listDrugs" method="get">
           <input type="submit" value="Listar fármacos">
             Limite: <input type="text" name="limit" value="">
         </form>
 
-        <form action = "/ListCompanies" method="get">
+        <form action = "listCompanies" method="get">
           <input type="submit" value="Listar empresas">
         </form>
 
-        <form action = "/searchDrug" method="get">
+        <form action = "searchDrug" method="get">
           <input type="submit" value="Buscar fármaco">
             Campo: <input type="text" name="active_ingredient" value="">
             Limite Drug: <input type="text" name="limit" value="">
         </form>
 
-        <form action = "/searchCompany" method="get">
+        <form action = "searchCompany" method="get">
           <input type="submit" value="Buscar empresas">
             Campo: <input type="text" name="company" value="">
             Limite Com: <input type="text" name="limit" value="">
         </form>
 
-        <form action = "/listWarnings" method="get">
+        <form action = "listWarnings" method="get">
           <input type="submit" value="Advertencias">
             Limite: <input type="text" name="limit" value="">
         </form>
@@ -288,4 +289,4 @@ def index():
         """
 
 if __name__ == "__main__":
-    app.run('127.0.0.1', port = 8000)
+    app.run('127.0.0.1', port = 8000, debug = True, use_reloader = False)
