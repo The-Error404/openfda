@@ -1,9 +1,11 @@
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import Response
+from flask import redirect
+from functools import wraps
 import http.client
 import json
-import random
 
 app = Flask(__name__)
 
@@ -38,6 +40,10 @@ def getActIng():
     for elem in main_dict:
         if 'brand_name' in elem['openfda']:
             name_list.append("<li>" + str(elem['openfda']['brand_name']).strip("['']") + "</li>")
+        else:
+            name_list.append("<li>Desconocido</li>")
+
+    name_str = str(''.join(name_list))
 
     def print_ul(elements):
         print("<ul>")
@@ -61,7 +67,7 @@ def getActIng():
 
     with open("templates/getActIng.html","w") as main_output:
         main_output.write("")
-        html_str_mod = html_str.format(r=name, l=limit, mans=str(name_list).strip("[',']"))
+        html_str_mod = html_str.format(r=name, l=limit, mans=name_str)
         main_output.write(html_str_mod)
 
     return render_template('getActIng.html')
@@ -91,6 +97,10 @@ def getComName():
     for elem in main_dict:
         if 'manufacturer_name' in elem['openfda']:
             med_list.append("<li>" + str(elem['openfda']['brand_name']).strip("['']") + "</li>")
+        else:
+            med_list.append("<li>Desconocido</li>")
+
+    med_str = str(''.join(med_list))
 
     html_str = """
         <!DOCTYPE html>
@@ -106,7 +116,7 @@ def getComName():
         """
 
     with open("templates/getComName.html","w") as main_output:
-        html_str_mod = html_str.format(r=company_name,l=limit,meds=str(med_list).strip("[',']"))
+        html_str_mod = html_str.format(r=company_name,l=limit,meds=med_str)
         main_output.write(html_str_mod)
 
     return render_template('getComName.html')
@@ -135,6 +145,10 @@ def getListDrugs():
     for elem in main_dict:
         if 'brand_name' in elem['openfda']:
             ran_list.append("<li>" + str(elem['openfda']['brand_name']).strip("['']") + "</li>")
+        else:
+            ran_list.append("<li>Desconocido</li>")
+
+    ran_str = str(''.join(ran_list))
 
     html_str = """
         <!DOCTYPE html>
@@ -150,7 +164,7 @@ def getListDrugs():
         """
 
     with open("templates/getListDrugs.html","w") as main_output:
-        html_str_mod = html_str.format(r=limit,l=limit, rans=str(ran_list).strip("[',']"))
+        html_str_mod = html_str.format(r=limit,l=limit, rans=ran_str)
         main_output.write(html_str_mod)
 
     return render_template('getListDrugs.html')
@@ -180,7 +194,9 @@ def getListCom():
         if 'manufacturer_name' in elem['openfda']:
             com_list.append("<li>" + str(elem['openfda']['manufacturer_name']).strip("['']") + "</li>")
         else:
-            com_list.append("Desconocido")
+            com_list.append("<li>Desconocido</li>")
+
+    com_str = str(''.join(com_list))
 
     html_str = """
         <!DOCTYPE html>
@@ -196,7 +212,7 @@ def getListCom():
         """
 
     with open("templates/getListCom.html","w") as main_output:
-        html_str_mod = html_str.format(r=limit,l=limit, prod=str(com_list).strip("[',']"))
+        html_str_mod = html_str.format(r=limit,l=limit, prod=com_str)
         main_output.write(html_str_mod)
 
     return render_template('getListCom.html')
@@ -225,6 +241,10 @@ def getListWar():
     for elem in main_dict:
         if 'warnings' in elem:
             war_list.append("<li>" + str(elem['warnings']).strip("['']") + "</li>")
+        else:
+            war_list.append("<li>Desconocido</li>")
+
+    war_str = str(''.join(war_list))
 
     html_str = """
         <!DOCTYPE html>
@@ -240,11 +260,21 @@ def getListWar():
         """
 
     with open("templates/getListWars.html","w") as main_output:
-        html_str_mod = html_str.format(l=limit, wars=str(war_list).strip("[',']"))
+        html_str_mod = html_str.format(l=limit, wars=war_str)
         main_output.write(html_str_mod)
 
     return render_template('getListWars.html')
 
+@app.route('/secret', methods = ['GET'])
+def getSecret():
+    return Response(
+    'Could not verify your access level for that URL.\n'
+    'You have to login with proper credentials', 401,
+    {'WWW-Authenticate': 'Basic realm="Not Authorized"'})
+
+@app.route('/redirect', methods = ['GET'])
+def getRedirect():
+    return redirect("http://127.0.0.1:8000/", code=302)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -257,33 +287,28 @@ def index():
             <title>OpenFDA-project</title>
         </head>
         <body>
-
         <form action = "listDrugs" method="get">
           <input type="submit" value="Listar fármacos">
             Limite: <input type="text" name="limit" value="">
         </form>
-
         <form action = "listCompanies" method="get">
           <input type="submit" value="Listar empresas">
+            Limite: <input type="text" name="limit" value="">
         </form>
-
         <form action = "searchDrug" method="get">
           <input type="submit" value="Buscar fármaco">
             Campo: <input type="text" name="active_ingredient" value="">
             Limite Drug: <input type="text" name="limit" value="">
         </form>
-
         <form action = "searchCompany" method="get">
           <input type="submit" value="Buscar empresas">
             Campo: <input type="text" name="company" value="">
             Limite Com: <input type="text" name="limit" value="">
         </form>
-
         <form action = "listWarnings" method="get">
           <input type="submit" value="Advertencias">
             Limite: <input type="text" name="limit" value="">
         </form>
-
         </body>
         </html>
         """
