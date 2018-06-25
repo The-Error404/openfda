@@ -18,22 +18,25 @@ main_conn = http.client.HTTPSConnection(MAIN_INPUT)
 @app.route ("/searchDrug", methods = ['GET']) # Busca hasta 100 medicamentos con el principio activo especificado
 def getActIng():
 
-    name = request.args['active_ingredient']
-    limit = request.args['limit']
+    name = request.args.get('active_ingredient')
+    limit = request.args.get('limit')
 
-    try:
+    if limit is None:
+
+        openfda_input = '/drug/label.json?search=active_ingredient:{acting}&limit=10'.format(acting=name)
+
+    else:
+
         openfda_input = '/drug/label.json?search=active_ingredient:{acting}&limit={lim}'.format(acting=name,lim=limit)
-        main_conn.request('GET', openfda_input, None, headers)
-    except:
-        print("Error")
-        exit(1)
+
+    main_conn.request('GET', openfda_input, None, headers)
 
     data_stage1 = main_conn.getresponse()
 
     data_stage2 = data_stage1.read()
     main_conn.close()
 
-    data_final = json.loads(data_stage2)
+    data_final = json.loads(data_stage2.decode('utf-8'))
 
     main_dict = data_final['results']
     name_list=[]
@@ -75,22 +78,25 @@ def getActIng():
 @app.route ("/searchCompany", methods = ['GET']) # Busca hasta 100 medicamentos fabricados por la empresa especificada
 def getComName():
 
-    company_name = request.args['company']
-    limit = request.args['limit']
+    company_name = request.args.get('company')
+    limit = request.args.get('limit')
 
-    try:
-        openfda_input = '/drug/label.json?search=manufacturer_name:{comnam}&limit={lim}'.format(comnam=company_name,lim=limit)
-        main_conn.request('GET', openfda_input, None, headers)
-    except:
-        print("Error")
-        exit(1)
+    if limit is None:
+
+        openfda_input = '/drug/label.json?search=openfda.manufacturer_name:{comnam}&limit=10'.format(comnam=company_name)
+
+    else:
+
+        openfda_input = '/drug/label.json?search=openfda.manufacturer_name:{comnam}&limit={lim}'.format(comnam=company_name,lim=limit)
+
+    main_conn.request('GET', openfda_input, None, headers)
 
     data_stage1 = main_conn.getresponse()
 
     data_stage2 = data_stage1.read()
     main_conn.close()
 
-    data_final = json.loads(data_stage2)
+    data_final = json.loads(data_stage2.decode('utf-8'))
 
     main_dict = data_final['results']
     med_list=[]
@@ -138,7 +144,7 @@ def getListDrugs():
     data_stage2 = data_stage1.read()
     main_conn.close()
 
-    data_final = json.loads(data_stage2)
+    data_final = json.loads(data_stage2.decode('utf-8'))
 
     main_dict = data_final['results']
     ran_list=[]
@@ -186,7 +192,7 @@ def getListCom():
     data_stage2 = data_stage1.read()
     main_conn.close()
 
-    data_final = json.loads(data_stage2)
+    data_final = json.loads(data_stage2.decode('utf-8'))
 
     main_dict = data_final['results']
     com_list=[]
@@ -234,7 +240,7 @@ def getListWar():
     data_stage2 = data_stage1.read()
     main_conn.close()
 
-    data_final = json.loads(data_stage2)
+    data_final = json.loads(data_stage2.decode('utf-8'))
 
     main_dict = data_final['results']
     war_list=[]
